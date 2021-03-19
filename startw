@@ -1,0 +1,8 @@
+#!/usr/bin/bash
+
+export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+export XKB_DEFAULT_LAYOUT=de
+
+./main &
+sleep 1
+QT_QPA_PLATFORM=wayland qterminal &
