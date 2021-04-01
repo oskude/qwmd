@@ -1,25 +1,43 @@
 # qml wayland mini desktop
 
-just having some fun with qt qml wayland...
+webmonkey having fun with qml and wayland...
 
-```
-> ./startw
-```
+![screencap](wincap.gif?raw=1)
 
-## requirements
+## features
 
-- qt6-base
+- mouse button visualiser
+- editable cursor text (speech) bubble
+- window preview list on the left
+- selected window maximised on the right
+
+## usage
+
+1. save a small image as `avatar.png` (the one from kernel.org fits nicely;)
+2. change keyboard layout in [`startw`](./startw)
+3. run: `./startw`
+
+> NOTE: i only tried this on x11...
+
+## deps
+
 - qt6-declarative
 - qt6-wayland
 - qt6-quickcontrols2 (TODO: replace SwipeView?)
-- pyside6 (TODO: why do i need this?)
-- qterminal (for [`startw`](./startw))
+- pyside6
+- qterminal (or change the terminal in [`main.qml`](./main.qml))
 
-## streaming
+> with small modifications this should also work with qt5 and pyside2
 
-| twitch | crop 1920 x 1080 |
-| - | - |
-| 284 x 160 | 1636 x 920 |
-| 640 x 360 | 1280 x 720 |
-| 852 x 480 | todo |
-| 1280 x 720 | todo |
+## todo
+
+- middle click in window list to close main window?
+- left click in window list should focus main window?
+- keyboard shortcut visualiser?
+- speech to text...
+  - tried [vosk](https://alphacephei.com/vosk/), "simple" setup, but got hilarous (and even "dangerous") results... (or my english is just that bad...)
+
+<br>
+<hr>
+
+All files in this repo - _where i have the say about_ - shall be in Public Domain.

@@ -1,18 +1,60 @@
 #!/usr/bin/python
 
-from PySide6.QtGui import QGuiApplication
-from PySide6.QtQml import QQmlApplicationEngine
-
-# nvidia shenanigangs TODO: do i still need this?
-from PySide6.QtCore import Qt
-from PySide6.QtCore import QCoreApplication
-QCoreApplication.setAttribute(Qt.AA_ShareOpenGLContexts, True)
-
-app = QGuiApplication([])
-eng = QQmlApplicationEngine("main.qml")
-
 # die on ctrl+c in terminal
 import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
+# data for qml
+import os
+from PySide6.QtCore import QObject, Slot, QEvent, Signal
+from PySide6.QtGui import QWindow, QCursor
+import subprocess
+class Io(QObject):
+	def __init__(self):
+		QObject.__init__(self)
+
+	pressed = False
+	mouseClick = Signal(int, int, int)
+	mouseWheel = Signal(int, int, int, int)
+
+	@Slot(str, result=str)
+	def runCmdline(self, cmdline):
+		return subprocess.Popen(
+			cmdline.split(),
+			env = os.environ | {"QT_QPA_PLATFORM":"wayland"}
+		).stdout
+
+	def eventFilter(self, object, event):
+		if type(object) != QWindow:
+			return False
+		etype = event.type()
+		if (etype == QEvent.MouseButtonPress or
+			etype == QEvent.MouseButtonRelease or
+			(etype == QEvent.MouseMove and self.pressed)):
+			btn = int(event.buttons())
+			pos = event.pos()
+			self.pressed = (btn > 0)
+			self.mouseClick.emit(btn, pos.x(), pos.y())
+		if etype == QEvent.Wheel:
+			pos = object.mapFromGlobal(QCursor.pos())
+			delta = event.angleDelta()
+			self.mouseWheel.emit(delta.x(), delta.y(), pos.x(), pos.y())
+		return False
+
+# render qml
+from PySide6.QtWidgets import QApplication
+from PySide6.QtQml import QQmlApplicationEngine
+app = QApplication([])
+
+io = Io()
+app.installEventFilter(io)
+
+eng = QQmlApplicationEngine(parent=app)
+eng.rootContext().setContextProperty("io", io)
+eng.load("main.qml")
 app.exec_()
+
+# nvidia shenanigangs TODO: do i still need this?
+#from PySide6.QtCore import Qt
+#from PySide6.QtCore import QCoreApplication
+#QCoreApplication.setAttribute(Qt.AA_ShareOpenGLContexts, True)

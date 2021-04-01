@@ -3,6 +3,7 @@ import QtWayland.Compositor
 
 Rectangle {
 	id: root
+	property double whasp: 1.0
 	property alias winlist: winList.model
 	signal windowSelected (int index)
 	ListView { id: winList
@@ -10,11 +11,10 @@ Rectangle {
 		delegate: ShellSurfaceItem {
 			shellSurface: modelData
 			width: root.width
-			height: width
+			height: width * whasp
 			inputEventsEnabled: false
 			MouseArea {
 				anchors.fill: parent
-				preventStealing: true
 				onClicked: root.windowSelected(index)
 			}
 		}
